@@ -4,6 +4,11 @@ import Navbar from "../components/Navbar";
 import Announcement from "../components/Announcement";
 import Footer from "../components/Footer";
 import { Add, Remove } from "@material-ui/icons";
+import { useSelector } from "react-redux";
+import StripeCheckout from "react-stripe-checkout";
+import { useEffect, useState } from "react";
+
+const KEY = process.env.REACT_APP_STRIPE;
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -134,6 +139,13 @@ const SummaryButton = styled.button`
 `;
 
 const Cart = () => {
+  const cart = useSelector((state) => state.cart);
+  const [stripeToken, setStripeToken] = useState(null);
+
+  const onToken = (token) => {
+    setStripeToken(token);
+  };
+  console.log(stripeToken);
   return (
     <Container>
       <Navbar />
@@ -150,63 +162,43 @@ const Cart = () => {
         </Top>
         <Bottom>
           <Info>
-            <Product>
-              <ProductDetail>
-                <Image src="https://img-lcwaikiki.mncdn.com/mnresize/1024/-/pim/productimages/20202/4629585/l_20202-0wcl93z8-cvl_a.jpg" />
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> COAT
-                  </ProductName>
-                  <ProductId>
-                    <b>ID :</b>315269031069
-                  </ProductId>
-                  <ProductColor color="black" />
-                  <ProductSize>
-                    <b>Size</b> XL
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>2</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>400$</ProductPrice>
-              </PriceDetail>
-            </Product>
+            {cart.products.map((product) => (
+              <Product>
+                <ProductDetail>
+                  <Image src={product.img} />
+                  <Details>
+                    <ProductName>
+                      <b>Product:</b> {product.title}
+                    </ProductName>
+                    <ProductId>
+                      <b>ID :</b>
+                      {product._id}
+                    </ProductId>
+                    <ProductColor color={product.color} />
+                    <ProductSize>
+                      <b>Size</b> {product.size}
+                    </ProductSize>
+                  </Details>
+                </ProductDetail>
+                <PriceDetail>
+                  <ProductAmountContainer>
+                    <Add />
+                    <ProductAmount>{product.quantity}</ProductAmount>
+                    <Remove />
+                  </ProductAmountContainer>
+                  <ProductPrice>
+                    {product.price * product.quantity}$
+                  </ProductPrice>
+                </PriceDetail>
+              </Product>
+            ))}
             <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://img-lcwaikiki.mncdn.com/mnresize/1024/-/pim/productimages/20202/4629585/l_20202-0wcl93z8-cvl_a.jpg" />
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> COAT
-                  </ProductName>
-                  <ProductId>
-                    <b>ID :</b>315269031069
-                  </ProductId>
-                  <ProductColor color="black" />
-                  <ProductSize>
-                    <b>Size</b> XL
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>2</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>400$</ProductPrice>
-              </PriceDetail>
-            </Product>
           </Info>
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal :</SummaryItemText>
-              <SummaryItemPrice> 800$</SummaryItemPrice>
+              <SummaryItemPrice> {cart.total}$</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Shipping Price </SummaryItemText>
@@ -218,9 +210,20 @@ const Cart = () => {
             </SummaryItem>
             <SummaryItem type="total">
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>800$</SummaryItemPrice>
+              <SummaryItemPrice>{cart.total}$</SummaryItemPrice>
             </SummaryItem>
-            <SummaryButton>CHECKOUT NOW</SummaryButton>
+            <StripeCheckout
+              name="Özgür Shop"
+              image="https://avatars.githubusercontent.com/u/1486366?v=4"
+              billingAddress
+              shippingAddress
+              description={`Your total is $${cart.total}`}
+              amount={cart.total * 100}
+              token={onToken}
+              stripeKey={KEY}
+            >
+              <SummaryButton>CHECKOUT NOW</SummaryButton>
+            </StripeCheckout>
           </Summary>
         </Bottom>
       </Wrapper>
