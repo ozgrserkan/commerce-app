@@ -1,8 +1,12 @@
 const router = require("express").Router();
-const stripe = require("stripe")(process.env.STRIPE_KEY);
+const KEY =
+  "sk_test_51K6wdTFUcgfXJqjz1bh7z2YRFcD26QLPsI2yuIShfv6Uq1HsZkXMhUr3lZkKaXp8qgOjWUyA5WlYpCmgmuZOpwxf000V9VDSlt";
+const stripe = require("stripe")(
+  "sk_test_51K6wdTFUcgfXJqjz1bh7z2YRFcD26QLPsI2yuIShfv6Uq1HsZkXMhUr3lZkKaXp8qgOjWUyA5WlYpCmgmuZOpwxf000V9VDSlt"
+);
 
 router.post("/payment", (req, res) => {
-  stripe.chargest.create(
+  stripe.charges.create(
     {
       source: req.body.tokenId,
       amount: req.body.amount,
@@ -17,3 +21,5 @@ router.post("/payment", (req, res) => {
     }
   );
 });
+
+module.exports = router;
