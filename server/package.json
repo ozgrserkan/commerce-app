@@ -19,6 +19,7 @@
     "nodemon": "^2.0.15",
     "react-redux": "^7.2.6",
     "react-stripe-checkout": "^2.6.3",
+    "redux-persist": "^6.0.0",
     "stripe": "^8.193.0"
   }
 }
